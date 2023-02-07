@@ -54,9 +54,11 @@ async def on_ready():
     if bool(os.environ.get('RESEND_INTRO', False)):
         logger.info('Resetting verification channel')
         channel = await interactions.get(bot, interactions.Channel, object_id=channel_id)
-        if (channel.message_count or 0) > 0:
+        try:
             async for m in channel.history():
                 await m.delete()
+        except IndexError:
+            pass
         await channel.send(
             'Welcome! Please accept the server rules, then press the button below.',
             components=[
