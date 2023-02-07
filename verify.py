@@ -115,6 +115,7 @@ async def on_verify_modal(ctx: interactions.ComponentContext, unite_id_s: str, i
         )
         return
 
+    await ctx.send('Success!', ephemeral=True)
     logger.info(f'Verification succeeded for {unite_id}')
     await set_roles(ctx.member, {
         verified_role_id: True,
