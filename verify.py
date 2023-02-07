@@ -1,9 +1,10 @@
+import logging
+import os
 from typing import Dict
+
 import interactions
 from pyairtable import Table
 from pyairtable.formulas import match
-import logging
-import os
 
 # Airtable parameters
 airtable_token = os.environ['AIRTABLE_TOKEN']
@@ -53,10 +54,11 @@ async def on_ready():
     if bool(os.environ.get('RESEND_INTRO', False)):
         logger.info('Resetting verification channel')
         channel = await interactions.get(bot, interactions.Channel, object_id=channel_id)
-        async for m in channel.history():
-            await m.delete()
+        if (channel.message_count or 0) > 0:
+            async for m in channel.history():
+                await m.delete()
         await channel.send(
-            '',
+            'Welcome! Please accept the server rules, then press the button below.',
             components=[
                 interactions.Button(
                     style=interactions.ButtonStyle.PRIMARY,
@@ -98,6 +100,7 @@ async def on_verify_modal(ctx: interactions.ComponentContext, unite_id_s: str, i
     unite_id = int(unite_id_s)
     is_manager = is_manager_s.lower() == 'y'
     if not link_member(ctx.member, unite_id):
+        logger.info(f'Verification failed for {unite_id}')
         await set_roles(ctx.member, {
             verified_role_id: False,
             manager_role_id: False,
@@ -112,12 +115,12 @@ async def on_verify_modal(ctx: interactions.ComponentContext, unite_id_s: str, i
         )
         return
 
+    logger.info(f'Verification succeeded for {unite_id}')
     await set_roles(ctx.member, {
         verified_role_id: True,
         manager_role_id: is_manager,
         ic_role_id: not is_manager
     })
-    # await ctx.send('All set :)', ephemeral=True)
 
 
 async def set_roles(member: interactions.Member, roles: Dict[int, bool]):
@@ -128,30 +131,6 @@ async def set_roles(member: interactions.Member, roles: Dict[int, bool]):
         else:
             if role_id in member.roles:
                 await member.remove_role(role_id)
-
-
-# @bot.command(
-#     name='verify',
-#     description='Verify yourself as a Unite the Union member',
-#     scope=guild_id,
-#     options=[
-#         interactions.Option(
-#             name='member_number',
-#             description='Your 8-digit Unite member number',
-#             type=interactions.OptionType.INTEGER,
-#             required=True,
-#         ),
-#     ]
-# )
-# async def cmd(ctx: interactions.CommandContext, member_number: int):
-#     await verify(ctx, member_number)
-#
-#
-# @cmd.error
-# async def cmd_error(ctx: interactions.CommandContext, error: Exception):
-#     logger.exception(error)
-#     msg = ''.join(traceback.TracebackException.from_exception(error).format())
-#     await ctx.send(f'An error occurred, please try again & if it persists ping [someone]:\n```\n{msg}\n```')
 
 
 bot.start()
