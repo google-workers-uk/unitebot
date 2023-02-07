@@ -1,0 +1,2 @@
+pyairtable~=1.4.0
+discord-py-interactions~=4.3.4
