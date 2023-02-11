@@ -49,6 +49,16 @@ bot = interactions.Client(token=discord_token, intents=interactions.Intents.ALL)
 
 
 @bot.event
+async def on_start():
+    logger.info('Bot started.')
+
+
+@bot.event
+async def on_disconnect():
+    logger.info('Bot disconnected.')
+
+
+@bot.event
 async def on_ready():
     logger.info('Bot ready.')
     if bool(os.environ.get('RESEND_INTRO', False)):
@@ -136,4 +146,6 @@ async def set_roles(member: interactions.Member, roles: Dict[int, bool]):
                 await member.remove_role(role_id)
 
 
+logger.info('Bot starting...')
 bot.start()
+logger.info('Bot stopped. Bye.')
