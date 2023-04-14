@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 run.sh
 .idea
+
+# macOS
+.DS_Store

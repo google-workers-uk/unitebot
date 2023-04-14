@@ -8,17 +8,17 @@ from pyairtable.formulas import match
 
 # Airtable parameters
 airtable_token = os.environ['AIRTABLE_TOKEN']
-base_id = 'appaulWdnLG5GQfri'
-members_table = Table(airtable_token, base_id, 'tblVToXUYB4nZq1Vo')
-discord_table = Table(airtable_token, base_id, 'tblvSyUAIL6Lkff83')
+base_id = os.environ['AIRTABLE_BASE_ID']
+members_table = Table(airtable_token, base_id, os.environ['AIRTABLE_MEMBERS_TABLE_ID'])
+discord_table = Table(airtable_token, base_id, os.environ['AIRTABLE_DISCORD_TABLE_ID'])
 
 # Discord parameters
 discord_token = os.environ['DISCORD_TOKEN']
-guild_id = 1070530949093261363
-channel_id = 1071641703292878919
-verified_role_id = 1070531989154828289
-manager_role_id = 1070533361480773652
-ic_role_id = 1070533453864501269
+guild_id = int(os.environ['DISCORD_GUILD_ID'])
+channel_id = int(os.environ['DISCORD_CHANNEL_ID'])
+verified_role_id = int(os.environ['DISCORD_VERIFIED_ROLE_ID'])
+manager_role_id = int(os.environ['DISCORD_MANAGER_ROLE_ID'])
+ic_role_id = int(os.environ['DISCORD_IC_ROLE_ID'])
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -121,7 +121,7 @@ async def on_verify_modal(ctx: interactions.ComponentContext, unite_id_s: str, i
         await ctx.send(
             f"We can't find your member number {unite_id} on the list yet, "
             "please double check and try again or "
-            "ping <@742133179653292164> with your member number "
+            f"ping <@{os.environ['DISCORD_ADMIN_USER_ID']}> with your member number "
             "and corp username",
             ephemeral=True,
         )
